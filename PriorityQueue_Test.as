@@ -1,16 +1,21 @@
-package cn.vbyte.data
+package
 {
 	public class PriorityQueue_Test
 	{
 		public function PriorityQueue_Test()
 		{
-			var queue:PriorityQueue = new PriorityQueue();
-			for (var i:int = 20; i > 0; i--) {
-				queue.enQueue("value:" + i, 20-i);
+			var queue:PriorityQueue = new PriorityQueue(false);
+			var v:Number;
+			for (var i:int = 0; i < 8; i++) {
+				v = Math.random();
+				queue.enQueue("value:" + v, int(v * 4));
 			}
-			for (var value:String = String(queue.deQueue()); value; value = String(queue.deQueue())) {
-				trace(value);
+			trace(queue.snapshot());
+			var out:String = "";
+			for (var o:Object = queue.deQueue(); o; o = queue.deQueue()) {
+				out += (o + "  ");
 			}
+			trace(out);
 		}
 	}
 }

@@ -1,4 +1,4 @@
-package cn.vbyte.data
+package
 {
 	import flash.utils.Dictionary;
 	
@@ -27,30 +27,30 @@ package cn.vbyte.data
 		
 		public function deQueue():Object {
 			if (_heap.length > 0) {
-				var value:Object = Element(_heap[0])._value;
+				var value:Object = _heap[0]._value;
 				if (_heap.length > 1) {
 					_heap[0] = _heap[_heap.length - 1];
 					_indexs[_heap[0]._value] = 0;
 					shiftDown(0);
 				}
 				--_heap.length;
+				delete _indexs[value];
 				return value;
 			}
 			return null;
-		}
-		
-		public function topQueue():Object {
-			return _heap.length > 0?_heap[0]._value:null;
 		}
 		
 		public function repriority(value:Object, priority:Number):Boolean {
 			if (!(value in _indexs)) {
 				return false;
 			}
-			var element:Element = _heap[_indexs[value]];
-			var oldPriority:Number = element._priority;
-			element._priority = priority;
-			// TODO. 
+			var oldPriority:Number = _heap[_indexs[value]]._priority;
+			_heap[_indexs[value]]._priority = priority;
+			if ((!_littleEndian && priority > oldPriority) || (_littleEndian && priority < oldPriority)) {
+				shiftUp(_indexs[value]);
+			} else if ((!_littleEndian && priority < oldPriority) || (_littleEndian && priority > oldPriority)){
+				shiftDown(_indexs[value]);
+			}
 			return true;
 		}
 		
@@ -83,7 +83,7 @@ package cn.vbyte.data
 				return;
 			}
 			for (var pindex:int = (index -1) >> 1; pindex >= 0; index = (index -1) >> 1,  pindex = (index - 1) >> 1) {
-				if ((!_littleEndian && _heap[index]._priority > _heap[pindex]._priority) ||_heap[index]._priority < _heap[pindex]._priority) {
+				if ((!_littleEndian && _heap[index]._priority > _heap[pindex]._priority) ||_littleEndian && _heap[index]._priority < _heap[pindex]._priority) {
 					swap(index, pindex);
 				} else {
 					break;
@@ -92,13 +92,13 @@ package cn.vbyte.data
 		}
 		
 		private function shiftDown(index:int):void {
-			if (index < 0 || index > (_heap.length >> 1)) {
+			if (index < 0 || index >= (_heap.length >> 1)) {
 				return;
 			}
 			var larger:int;
 			for (var lcIndex:int = (index << 1) +1, rcIndex:int = (index << 1) + 2; lcIndex < _heap.length; index = larger, lcIndex = (index << 1)+1, rcIndex = (index << 1)+2){
 				larger = (rcIndex < _heap.length)?((_heap[lcIndex]._priority > _heap[rcIndex]._priority)?lcIndex:rcIndex):lcIndex;
-				if ((!_littleEndian && _heap[index]._priority < _heap[larger]._priority) || _heap[index]._priority > _heap[larger]._priority) {
+				if ((!_littleEndian && _heap[index]._priority < _heap[larger]._priority) || _littleEndian && _heap[index]._priority > _heap[larger]._priority) {
 					swap(index, larger);
 				} else {
 					break;
@@ -106,7 +106,7 @@ package cn.vbyte.data
 			}
 			
 		}
-
+		
 		private function swap(i:int, j:int):void {
 			var temp:Element;
 			temp = _heap[i];
