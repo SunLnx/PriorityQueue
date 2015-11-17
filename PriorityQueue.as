@@ -1,4 +1,4 @@
-package
+package cn.vbyte.data
 {
 	import flash.utils.Dictionary;
 	
@@ -40,6 +40,10 @@ package
 			return null;
 		}
 		
+		public function top():Object {
+			return (_heap.length > 0)? _heap[0]._value:null;
+		}
+		
 		public function repriority(value:Object, priority:Number):Boolean {
 			if (!(value in _indexs)) {
 				return false;
@@ -55,10 +59,14 @@ package
 		}
 		
 		public function priority(value:Object):Number {
-			if (!(value in _indexs)) {
+			if (value in _indexs) {
 				return _heap[_indexs[value]]._priority;
 			}
 			return  -1;
+		}
+		
+		public function exist(value:Object):Boolean {
+			return value in _indexs;
 		}
 		
 		public function remove(value:Object):Number {
@@ -67,15 +75,24 @@ package
 			}
 			var index:int = _indexs[value];
 			var priority:Number = _heap[index]._priority;
-			_heap[index] = _heap[_heap.length-1];
-			--_heap.length;
 			delete _indexs[value];
+			if (index != _heap.length -1) {
+				_heap[index] = _heap[_heap.length-1];
+				_indexs[_heap[index]._value] = index;
+			}
+			--_heap.length;
+			shiftUp(index);
 			shiftDown(index);
 			return priority;
 		}
 		
-		public function size():int {
+		public function get size():int {
 			return _heap.length;
+		}
+		
+		public function clear():void {
+			_heap.length = 0;
+			_indexs = new Dictionary();
 		}
 		
 		private function shiftUp(index:int):void {
@@ -104,7 +121,6 @@ package
 					break;
 				}
 			}
-			
 		}
 		
 		private function swap(i:int, j:int):void {
@@ -119,7 +135,7 @@ package
 		public function snapshot():String {
 			var str:String = "";
 			for (var i:int = 0; i < _heap.length; ++i) {
-				str += ("p:" + _heap[i]._priority + "\tv:" + _heap[i]._value + "\n");
+				str += ("p:" + _heap[i]._priority + "\tv:" + _heap[i]._value + "\tindex:"+ _indexs[_heap[i]._value] + "\n");
 			}
 			return str;
 		}
@@ -130,7 +146,18 @@ internal class Element {
 	public var _priority:Number;
 	public var _value:Object;
 	public function Element(value:Object, priority:Number):void {
-		_priority = priority;
 		_value = value;
+		_priority = priority;
+	}
+}
+
+internal class Iterate {
+	public var _keys:Array
+	public var _cursor:int;
+	public function get next():Object {
+		return null;
+	}
+	public function hasNext():Boolean {
+		return false;
 	}
 }
