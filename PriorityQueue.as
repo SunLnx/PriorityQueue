@@ -81,7 +81,6 @@ package cn.vbyte.data
 				_indexs[_heap[index]._value] = index;
 			}
 			--_heap.length;
-			shiftUp(index);
 			shiftDown(index);
 			return priority;
 		}
