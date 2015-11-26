@@ -99,11 +99,22 @@ package cn.vbyte.data
 			if (index <= 0 || index >= _heap.length) {
 				return;
 			}
-			for (var pindex:int = (index -1) >> 1; pindex >= 0; index = (index -1) >> 1,  pindex = (index - 1) >> 1) {
-				if ((!_littleEndian && _heap[index]._priority > _heap[pindex]._priority) ||_littleEndian && _heap[index]._priority < _heap[pindex]._priority) {
-					swap(index, pindex);
-				} else {
-					break;
+			var pindex:int;
+			if (!_littleEndian) {
+				for (pindex= (index -1) >> 1; pindex >= 0; index = (index -1) >> 1,  pindex = (index - 1) >> 1) {
+					if ( _heap[index]._priority > _heap[pindex]._priority) {
+						swap(index, pindex);
+					} else {
+						break;
+					}
+				}
+			} else {
+				for (pindex = (index -1) >> 1; pindex >= 0; index = (index -1) >> 1,  pindex = (index - 1) >> 1) {
+					if (_heap[index]._priority < _heap[pindex]._priority) {
+						swap(index, pindex);
+					} else {
+						break;
+					}
 				}
 			}
 		}
@@ -112,13 +123,26 @@ package cn.vbyte.data
 			if (index < 0 || index >= (_heap.length >> 1)) {
 				return;
 			}
-			var larger:int;
-			for (var lcIndex:int = (index << 1) +1, rcIndex:int = (index << 1) + 2; lcIndex < _heap.length; index = larger, lcIndex = (index << 1)+1, rcIndex = (index << 1)+2){
-				larger = (rcIndex < _heap.length)?((_heap[lcIndex]._priority > _heap[rcIndex]._priority)?lcIndex:rcIndex):lcIndex;
-				if ((!_littleEndian && _heap[index]._priority < _heap[larger]._priority) || _littleEndian && _heap[index]._priority > _heap[larger]._priority) {
-					swap(index, larger);
-				} else {
-					break;
+			var lcIndex:int, rcIndex:int;
+			if (!_littleEndian) {
+				var larger:int;
+				for (lcIndex = (index << 1) +1, rcIndex = (index << 1) + 2; lcIndex < _heap.length; index = larger, lcIndex = (index << 1)+1, rcIndex = (index << 1)+2){
+					larger = (rcIndex < _heap.length)?((_heap[lcIndex]._priority > _heap[rcIndex]._priority)?lcIndex:rcIndex):lcIndex;
+					if (_heap[index]._priority < _heap[larger]._priority) {
+						swap(index, larger);
+					} else {
+						break;
+					}
+				}
+			} else {
+				var smaller:int;
+				for (lcIndex = (index << 1) +1, rcIndex = (index << 1) + 2; lcIndex < _heap.length; index = smaller, lcIndex = (index << 1)+1, rcIndex = (index << 1)+2){
+					smaller = (rcIndex < _heap.length)?((_heap[lcIndex]._priority < _heap[rcIndex]._priority)?lcIndex:rcIndex):lcIndex;
+					if (_heap[index]._priority > _heap[smaller]._priority) {
+						swap(index, smaller);
+					} else {
+						break;
+					}
 				}
 			}
 		}
